@@ -38,7 +38,7 @@
         </div>
 
         <!-- Sonuç Gösterim Alanı -->
-        <div id="resultContainer" class="mt-8 p-6 rounded-lg hidden">
+        <div id="resultContainer" class="mt-8 p-6 rounded-lg border hidden">
             <h3 id="resultTitle" class="text-lg font-bold"></h3>
             <p id="resultScore" class="mt-1 text-sm"></p>
             <p id="resultDescription" class="mt-2"></p>
@@ -109,8 +109,9 @@
             const mesaj = messageInput.value;
             const analizSonucu = riskAnalizi(mesaj);
 
-            resultContainer.className = 'mt-8 p-6 rounded-lg border'; // Reset classes
-
+            // Sonuç kutusunun stillerini sıfırla ve yeniden ayarla
+            resultContainer.className = 'mt-8 p-6 rounded-lg border'; 
+            
             if (analizSonucu.sonuc === 'Riskli') {
                 resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
                 resultTitle.textContent = `ANALİZ SONUCU: RİSKLİ`;
@@ -125,7 +126,22 @@
                 resultScore.textContent = '';
             }
             resultDescription.textContent = analizSonucu.aciklama;
+            resultContainer.classList.remove('hidden');
         });
     </script>
 </body>
 </html>
+```
+
+### **Ne Yapmalısınız?**
+
+Lütfen bir önceki sefer yaptığımız adımları **tekrar edelim**:
+
+1.  **Dosyayı Düzenle:** [Gozcu GitHub Reponuza](https://github.com/ErkanGungor/Gozcu) gidin, `index.html` dosyasına tıklayın ve sağ üstteki **kalem (Edit)** ikonuna basın.
+2.  **Tümünü Sil:** Düzenleme ekranında, kutunun içindeki **mevcut kodun tamamını seçin ve silin.** Bu adım çok önemli.
+3.  **Yeni Kodu Yapıştır:** Yukarıdaki düzeltilmiş kod bloğunun tamamını kopyalayıp GitHub'daki boş alana yapıştırın.
+4.  **Değişikliği Kaydet:** Sayfanın altındaki yeşil **"Commit changes"** butonuna basın.
+
+Bu işlemi yaptıktan sonra **2-3 dakika bekleyin** (GitHub'ın sitenizi güncellemesi için). Ardından, **`https://erkangungor.github.io/Gozcu/`** linkini tarayıcınızın **"Gizli Pencere"** modunda açmayı deneyin. Bu, tarayıcı önbelleğinden kaynaklanan sorunları engeller.
+
+Bu adımlardan sonra sorunun çözülmesi gerekiy
