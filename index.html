@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gözcü Projesi - İnteraktif Demo</title>
-    <!-- Tailwind CSS'i projeye dahil ediyoruz (Hata burada düzeltildi) -->
+    <title>Gözcü Projesi - AI Destekli Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,31 +12,41 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Buton yüklenme animasyonu için stil */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-lg">
 
-        <!-- Başlık ve Açıklama Alanı -->
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">Gözcü Projesi</h1>
-            <p class="mt-2 text-gray-600">Rekabet Hukuku Uyum Asistanı - İnteraktif Demo</p>
+            <p class="mt-2 text-gray-600">AI Destekli Rekabet Hukuku Uyum Asistanı</p>
         </div>
 
-        <!-- Metin Giriş Alanı -->
         <div class="mt-8">
             <label for="message" class="block text-sm font-medium text-gray-700">Analiz edilecek mesajınızı buraya yazın:</label>
-            <textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Örn: Arkadaşlar, rakip firma ile görüştüm. Fiyatları artıralım diyorum..."></textarea>
+            <textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Örn: Rakiplerin yeni fiyat listesini aldım, biz de ona göre bir zam yapalım..."></textarea>
         </div>
 
-        <!-- Buton Alanı -->
         <div class="mt-6">
-            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
-                Mesajı Analiz Et
+            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center">
+                <span id="buttonText">Mesajı Analiz Et</span>
+                <div id="loader" class="loader hidden ml-3"></div>
             </button>
         </div>
 
-        <!-- Sonuç Gösterim Alanı -->
         <div id="resultContainer" class="mt-8 p-6 rounded-lg border hidden">
             <h3 id="resultTitle" class="text-lg font-bold"></h3>
             <p id="resultScore" class="mt-1 text-sm"></p>
@@ -52,66 +61,98 @@
         const resultTitle = document.getElementById('resultTitle');
         const resultScore = document.getElementById('resultScore');
         const resultDescription = document.getElementById('resultDescription');
+        const buttonText = document.getElementById('buttonText');
+        const loader = document.getElementById('loader');
 
-        function riskAnalizi(metin) {
-            if (!metin.trim()) {
-                return {
-                    sonuc: "Boş Metin",
-                    risk_skoru: 0.0,
-                    aciklama: "Lütfen analiz edilecek bir metin girin."
-                };
-            }
+        /**
+         * YENİ: Bu fonksiyon artık Google'ın Gemini AI modeline bir API isteği gönderiyor.
+         */
+        async function aiRiskAnalizi(metin) {
+            // Butonu yüklenme moduna alıyoruz.
+            buttonText.textContent = "Analiz Ediliyor...";
+            loader.classList.remove('hidden');
+            analyzeButton.disabled = true;
 
-            const temiz_metin = metin.toLowerCase();
-            const risk_katalogu = {
-                "Fiyat Anlaşması Riski": {
-                    "kelimeler": ["fiyatları artıralım", "fiyatları yükseltelim", "fiyat sabitleyelim", "aynı fiyattan", "fiyat listesi", "zam yapalım"],
-                    "skor": 0.95
-                },
-                "Pazar Paylaşımı Riski": {
-                    "kelimeler": ["bölge paylaşımı", "pazarı paylaşalım", "sen o bölgeye girme", "müşterileri paylaşalım", "sen o müşteriye gitme"],
-                    "skor": 0.90
-                },
-                "Rakip Bilgisi Riski": {
-                    "kelimeler": ["rakibin teklifi", "rakip fiyatı", "rakibin maliyeti", "gizli bilgi"],
-                    "skor": 0.75
-                }
-            };
+            const apiKey = ""; // Bu demo için API Key gerekmez.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-            let tespit_edilen_riskler = [];
-            for (const [kategori, detay] of Object.entries(risk_katalogu)) {
-                for (const kelime of detay.kelimeler) {
-                    if (temiz_metin.includes(kelime)) {
-                        tespit_edilen_riskler.push({
-                            "risk_kategorisi": kategori,
-                            "risk_skoru": detay.skor,
-                            "tetikleyen_ifade": kelime
-                        });
+            // Yapay zekaya rolünü ve görevini anlatan talimat (prompt)
+            const prompt = `
+            Sen Türk Rekabet Hukuku konusunda uzman bir yapay zeka asistanısın. Görevin, sana verilen metni analiz edip potansiyel rekabet hukuku ihlali riski taşıyıp taşımadığını değerlendirmektir.
+            Analizinde özellikle şu üç ana riske odaklan:
+            1.  **Fiyat Anlaşması Riski**: Rakiplerle birlikte fiyat belirleme, zam yapma, indirimleri koordine etme.
+            2.  **Pazar Paylaşımı Riski**: Rakiplerle bölge, müşteri veya pazar paylaşma anlaşmaları.
+            3.  **Hassas Bilgi Değişimi Riski**: Rakiplerle fiyat, maliyet, teklif gibi ticari sırların paylaşılması.
+            
+            Analiz edilecek metin: "${metin}"
+            
+            Lütfen analizinin sonucunu, aşağıda tanımlanan JSON formatına birebir uygun olarak ver. Metinde hiçbir risk yoksa, sonucu "Temiz" olarak belirt, risk skoru olarak 0.1 gibi düşük bir değer ata ve açıklamayı olumlu yap. Risk varsa, en önemli riski belirt ve skorunu 0.5 ile 1.0 arasında ata.
+            `;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            sonuc: { "type": "STRING", "enum": ["Riskli", "Temiz"] },
+                            risk_kategorisi: { "type": "STRING" },
+                            risk_skoru: { "type": "NUMBER" },
+                            aciklama: { "type": "STRING" }
+                        },
+                        "required": ["sonuc", "risk_kategorisi", "risk_skoru", "aciklama"]
                     }
                 }
-            }
+            };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API isteği başarısız oldu: ${response.status}`);
+                }
 
-            if (tespit_edilen_riskler.length === 0) {
+                const result = await response.json();
+                const jsonText = result.candidates[0].content.parts[0].text;
+                return JSON.parse(jsonText);
+
+            } catch (error) {
+                console.error("Hata:", error);
                 return {
-                    sonuc: "Temiz",
-                    risk_skoru: 0.10,
-                    aciklama: "Metinde belirgin bir rekabet hukuku riski tespit edilmedi."
+                    sonuc: "Hata",
+                    aciklama: "Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin."
                 };
-            } else {
-                let en_yuksek_risk = tespit_edilen_riskler.sort((a, b) => b.risk_skoru - a.risk_skoru)[0];
-                en_yuksek_risk.sonuc = 'Riskli';
-                en_yuksek_risk.aciklama = `'${en_yuksek_risk.tetikleyen_ifade}' ifadesi nedeniyle yüksek risk tespit edildi.`;
-                return en_yuksek_risk;
+            } finally {
+                // Analiz bitince butonu eski haline getir.
+                buttonText.textContent = "Mesajı Analiz Et";
+                loader.classList.add('hidden');
+                analyzeButton.disabled = false;
             }
         }
 
-        analyzeButton.addEventListener('click', () => {
+        analyzeButton.addEventListener('click', async () => {
             const mesaj = messageInput.value;
-            const analizSonucu = riskAnalizi(mesaj);
+            if (!mesaj.trim()) {
+                // Boş metin kontrolü
+                resultContainer.className = 'mt-8 p-6 rounded-lg border bg-yellow-100 border-yellow-500 text-yellow-900';
+                resultTitle.textContent = 'UYARI';
+                resultScore.textContent = '';
+                resultDescription.textContent = "Lütfen analiz edilecek bir metin girin.";
+                resultContainer.classList.remove('hidden');
+                return;
+            }
 
-            // Sonuç kutusunun stillerini sıfırla ve yeniden ayarla
-            resultContainer.className = 'mt-8 p-6 rounded-lg border'; 
+            const analizSonucu = await aiRiskAnalizi(mesaj);
             
+            resultContainer.className = 'mt-8 p-6 rounded-lg border';
+
             if (analizSonucu.sonuc === 'Riskli') {
                 resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
                 resultTitle.textContent = `ANALİZ SONUCU: RİSKLİ`;
@@ -120,9 +161,9 @@
                 resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
                 resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
                 resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
-            } else {
+            } else { // Hata durumu
                 resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');
-                resultTitle.textContent = 'UYARI';
+                resultTitle.textContent = 'HATA';
                 resultScore.textContent = '';
             }
             resultDescription.textContent = analizSonucu.aciklama;
@@ -131,4 +172,3 @@
     </script>
 </body>
 </html>
-```
