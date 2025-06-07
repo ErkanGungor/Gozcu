@@ -64,19 +64,14 @@
         const buttonText = document.getElementById('buttonText');
         const loader = document.getElementById('loader');
 
-        /**
-         * YENİ: Bu fonksiyon artık Google'ın Gemini AI modeline bir API isteği gönderiyor.
-         */
         async function aiRiskAnalizi(metin) {
-            // Butonu yüklenme moduna alıyoruz.
             buttonText.textContent = "Analiz Ediliyor...";
             loader.classList.remove('hidden');
             analyzeButton.disabled = true;
 
-            const apiKey = ""; // Bu demo için API Key gerekmez.
+            const apiKey = ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-            // Yapay zekaya rolünü ve görevini anlatan talimat (prompt)
             const prompt = `
             Sen Türk Rekabet Hukuku konusunda uzman bir yapay zeka asistanısın. Görevin, sana verilen metni analiz edip potansiyel rekabet hukuku ihlali riski taşıyıp taşımadığını değerlendirmektir.
             Analizinde özellikle şu üç ana riske odaklan:
@@ -109,35 +104,34 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API isteği başarısız oldu: ${response.status}`);
+                    throw new Error(`API isteği başarısız oldu. Durum Kodu: ${response.status}`);
                 }
 
                 const result = await response.json();
                 
-                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                if (result.candidates && result.candidates[0]?.content?.parts[0]) {
                     let jsonText = result.candidates[0].content.parts[0].text;
                     
-                    // HATA DÜZELTME: API bazen cevabı markdown formatında (```json ... ```) döndürebiliyor.
-                    // Bu satırlar, bu formatı temizleyerek sadece saf JSON metnini bırakır.
-                    if (jsonText.startsWith("```json")) {
-                        jsonText = jsonText.substring(7, jsonText.length - 3).trim();
-                    } else if (jsonText.startsWith("```")) {
-                        jsonText = jsonText.substring(3, jsonText.length - 3).trim();
+                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                    if (jsonMatch && jsonMatch[0]) {
+                        return JSON.parse(jsonMatch[0]);
+                    } else {
+                         throw new Error("API cevabında geçerli bir JSON bulunamadı.");
                     }
 
-                    return JSON.parse(jsonText);
                 } else {
-                    throw new Error("API'den beklenen formatta bir cevap alınamadı.");
+                    // API'den bir cevap geldi ancak 'candidates' kısmı boş veya hatalıysa bunu belirtelim.
+                    throw new Error("API'den beklenen formatta bir cevap alınamadı. Gelen cevap: " + JSON.stringify(result));
                 }
 
             } catch (error) {
                 console.error("Hata:", error);
+                // DÜZELTME: Hata mesajını daha detaylı hale getiriyoruz.
                 return {
                     sonuc: "Hata",
-                    aciklama: "Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin."
+                    aciklama: `Teknik Hata: ${error.message}`
                 };
             } finally {
-                // Analiz bitince butonu eski haline getir.
                 buttonText.textContent = "Mesajı Analiz Et";
                 loader.classList.add('hidden');
                 analyzeButton.disabled = false;
@@ -147,7 +141,6 @@
         analyzeButton.addEventListener('click', async () => {
             const mesaj = messageInput.value;
             if (!mesaj.trim()) {
-                // Boş metin kontrolü
                 resultContainer.className = 'mt-8 p-6 rounded-lg border bg-yellow-100 border-yellow-500 text-yellow-900';
                 resultTitle.textContent = 'UYARI';
                 resultScore.textContent = '';
@@ -168,7 +161,7 @@
                 resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
                 resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
                 resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
-            } else { // Hata durumu
+            } else { 
                 resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');
                 resultTitle.textContent = 'HATA';
                 resultScore.textContent = '';
@@ -179,3 +172,5 @@
     </script>
 </body>
 </html>
+```
+Lütfen GitHub'daki `index.html` dosyanızı bu yeni kodla güncelleyin. Şimdi tekrar denediğinizde, sarı hata kutusunda daha teknik bir açıklama görmelisiniz. O yeni hata mesajını bana iletirseniz, sorunu kesin olarak çözebilir
