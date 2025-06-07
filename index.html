@@ -3,131 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gözcü Projesi - Gelişmiş Demo</title>
+    <title>Gözcü Projesi - Akıllı Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Fuzzy Search & NLP Kütüphaneleri -->
+    <script src="https://unpkg.com/fuzzysort"></script>
+    <script src="https://unpkg.com/compromise@latest/builds/compromise.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
+    <style> 
+        body { font-family: 'Inter', sans-serif; } 
+        mark {
+            border-radius: 3px;
+            padding: 2px 3px;
         }
     </style>
 </head>
-<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+<body class="bg-gray-50 flex items-center justify-center min-h-screen py-12">
     <div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-lg">
-
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">Gözcü Projesi</h1>
-            <p class="mt-2 text-gray-600">Gelişmiş Rekabet Hukuku Uyum Asistanı</p>
+            <p class="mt-2 text-gray-600">Akıllı Rekabet Hukuku Uyum Asistanı</p>
         </div>
-
         <div class="mt-8">
-            <label for="message" class="block text-sm font-medium text-gray-700">Analiz edilecek mesajınızı buraya yazın:</label>
-            <textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Örn: Rakiplerin yeni fiyat listesini aldım, biz de ona göre bir zam yapalım..."></textarea>
+            <label for="message" class="block text-sm font-medium text-gray-700">Analiz edilecek mesajınız:</label>
+            <textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 transition" placeholder="Örn: Rakiplerin yeni fiyat listesini aldım, ona göre bir zam yapsak iyi olur..."></textarea>
         </div>
-
         <div class="mt-6">
-            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
-                Mesajı Analiz Et
-            </button>
+            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transform hover:scale-105 transition">Analiz Et</button>
         </div>
-
-        <div id="resultContainer" class="mt-8 p-6 rounded-lg border hidden">
+        <div id="resultContainer" class="mt-8 p-6 rounded-lg border-2 hidden">
             <h3 id="resultTitle" class="text-lg font-bold"></h3>
-            <p id="resultScore" class="mt-1 text-sm"></p>
-            <p id="resultDescription" class="mt-2"></p>
+            <p id="resultScore" class="mt-1 text-sm font-semibold"></p>
+            <div id="resultDescription" class="mt-3 text-sm space-y-4"></div>
         </div>
     </div>
 
     <script>
-        const analyzeButton = document.getElementById('analyzeButton');
-        const messageInput = document.getElementById('message');
-        const resultContainer = document.getElementById('resultContainer');
-        const resultTitle = document.getElementById('resultTitle');
-        const resultScore = document.getElementById('resultScore');
-        const resultDescription = document.getElementById('resultDescription');
+    // --- Risk Kataloğu (JSON içinde) ---
+    const riskKatalogu = {
+        "Fiyat Anlaşması Riski": {
+            "patterns": ["fiyat listesi","zam yapal","aynı fiyat","fiyatları artıralım","fiyatları yükseltelim"],
+            "skor": 0.95,
+            "aciklama_sablonu": "'{ifade}' ifadesi, rakiplerle fiyat belirleme riski taşır."
+        },
+        "Pazar Paylaşımı Riski": {
+            "patterns": ["pazar paylaş","müşteri paylaş","bölge paylaş"],
+            "skor": 0.90,
+            "aciklama_sablonu": "'{ifade}' ifadesi, pazar veya müşteri paylaşma riski taşır."
+        },
+        "Hassas Bilgi Riski": {
+            "patterns": ["rakibin teklifi","gizli bilgi","rakibin fiyat"],
+            "skor": 0.75,
+            "aciklama_sablonu": "'{ifade}' ifadesi, hassas bilgi paylaşımı riski taşır."
+        }
+    };
 
-        /**
-         * GELİŞTİRİLMİŞ ANALİZ MOTORU: Bu fonksiyon, dış bir API'ye ihtiyaç duymadan,
-         * daha akıllı bir kural seti ile metni analiz eder.
-         */
-        function gelismisRiskAnalizi(metin) {
-            if (!metin.trim()) {
-                return { sonuc: "Boş Metin", aciklama: "Lütfen analiz edilecek bir metin girin." };
-            }
+    // --- Helpers ---
+    function escapeRegExp(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    function debounce(fn, ms) {
+        let timer;
+        return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+    }
 
-            const temiz_metin = metin.toLowerCase();
-            
-            // Anahtar kelimeler yerine daha esnek olan "Regular Expressions" (Regex) kullanıyoruz.
-            // Bu sayede "zam yapalım", "zam yapsak", "zam yapacağız" gibi farklı kullanımları yakalayabiliriz.
-            const risk_katalogu = {
-                "Fiyat Anlaşması Riski": {
-                    "regex": /(fiyatları\s*(artıralım|yükseltelim|sabitleyelim))|(aynı\s*fiyat)|(fiyat\s*listesi)|(zam\s*(yap|yapac))/,
-                    "skor": 0.95,
-                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle fiyat belirleme riski taşıyabilir."
-                },
-                "Pazar Paylaşımı Riski": {
-                    "regex": /(bölge|pazar|müşteri.*)\s*(paylaş|paylaşım|paylaşalım|paylaşımı)|(sen\s*o\s*(bölgeye|müşteriye)\s*girme)/,
-                    "skor": 0.90,
-                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle pazar veya müşteri paylaşma riski taşıyabilir."
-                },
-                "Hassas Bilgi Değişimi Riski": {
-                    "regex": /(rakibin\s*(teklifi|fiyatı|maliyeti))|(gizli\s*bilgi)/,
-                    "skor": 0.75,
-                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle hassas ticari bilgi paylaşımı riski taşıyabilir."
+    // --- Analiz & Highlight ---
+    function analizEt(metin) {
+        const temiz = metin.toLowerCase();
+        let bulunan = [];
+
+        Object.entries(riskKatalogu).forEach(([kategori, {patterns, skor, aciklama_sablonu}]) => {
+            patterns.forEach(pat => {
+                // fuzzy match ile arama yapılıyor.
+                const sonuc = fuzzysort.single(pat, temiz);
+                // score ne kadar 0'a yakınsa o kadar iyi eşleşme demektir. -200 makul bir eşik.
+                if (sonuc && sonuc.score > -200) { 
+                    const ifade = sonuc.target; // fuzzysort, eşleşen kelimeyi 'target' içinde döner.
+                    bulunan.push({kategori, skor, ifade, aciklama: aciklama_sablonu.replace('{ifade}', ifade)});
                 }
-            };
+            });
+        });
 
-            let tespit_edilen_riskler = [];
-            for (const [kategori, detay] of Object.entries(risk_katalogu)) {
-                const eslesme = temiz_metin.match(detay.regex);
-                if (eslesme) {
-                    tespit_edilen_riskler.push({
-                        "risk_kategorisi": kategori,
-                        "risk_skoru": detay.skor,
-                        "tetikleyen_ifade": eslesme[0].trim(), // Eşleşen ifadenin kendisini alıyoruz.
-                        "aciklama": detay.aciklama_sablonu.replace('{ifade}', eslesme[0].trim())
-                    });
-                }
-            }
-
-            if (tespit_edilen_riskler.length === 0) {
-                return {
-                    sonuc: "Temiz",
-                    risk_skoru: 0.10,
-                    aciklama: "Metinde belirgin bir rekabet hukuku riski tespit edilmedi."
-                };
-            } else {
-                let en_yuksek_risk = tespit_edilen_riskler.sort((a, b) => b.risk_skoru - a.risk_skoru)[0];
-                en_yuksek_risk.sonuc = 'Riskli';
-                return en_yuksek_risk;
-            }
+        // Çıktı
+        if (!bulunan.length) {
+            return { sonuc: 'Temiz', skor: 0.10, aciklama: 'Metinde belirgin bir rekabet hukuku riski bulunamadı.' };
         }
 
-        analyzeButton.addEventListener('click', () => {
-            const mesaj = messageInput.value;
-            const analizSonucu = gelismisRiskAnalizi(mesaj);
+        // En yüksek skorlu riski ana kategori olarak al
+        const anaRisk = bulunan.sort((a,b) => b.skor - a.skor)[0];
+        const ortalamaSkor = bulunan.reduce((s, r) => s + r.skor, 0) / bulunan.length;
+        
+        return { 
+            sonuc: 'Riskli', 
+            detay: bulunan, 
+            skor: ortalamaSkor.toFixed(2),
+            anaKategori: anaRisk.kategori
+        };
+    }
 
-            resultContainer.className = 'mt-8 p-6 rounded-lg border'; 
-
-            if (analizSonucu.sonuc === 'Riskli') {
-                resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
-                resultTitle.textContent = `ANALİZ SONUCU: RİSKLİ`;
-                resultScore.textContent = `Risk Kategorisi: ${analizSonucu.risk_kategorisi} | Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
-            } else if (analizSonucu.sonuc === 'Temiz') {
-                resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
-                resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
-                resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
-            } else {
-                resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');
-                resultTitle.textContent = 'UYARI';
-                resultScore.textContent = '';
-            }
-            resultDescription.textContent = analizSonucu.aciklama;
-            resultContainer.classList.remove('hidden');
+    function highlight(metin, bulunan) {
+        let html = metin;
+        const uniqueIfadeler = [...new Set(bulunan.map(item => item.ifade))];
+        
+        uniqueIfadeler.forEach((ifade) => {
+            const rgx = new RegExp(escapeRegExp(ifade), 'gi');
+            html = html.replace(rgx, `<mark class="bg-yellow-200">${ifade}</mark>`);
         });
+        return html.replace(/\n/g, '<br>'); // Satır sonlarını HTML'e çevir
+    }
+
+    // --- Event Listener ---
+    const analyzeButton = document.getElementById('analyzeButton');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultScore = document.getElementById('resultScore');
+    const resultDescription = document.getElementById('resultDescription');
+    const messageInput = document.getElementById('message');
+
+    const runAnalysis = () => {
+        const mesaj = messageInput.value;
+        if (!mesaj.trim()) {
+            resultContainer.classList.add('hidden');
+            return;
+        }
+        
+        const res = analizEt(mesaj);
+        
+        resultContainer.className = 'mt-8 p-6 rounded-lg border-2';
+
+        if (res.sonuc === 'Riskli') {
+            resultContainer.classList.add('bg-red-50','border-red-500','text-red-900');
+            resultTitle.textContent = 'ANALİZ SONUCU: RİSKLİ';
+            resultScore.textContent = `Ortalama Risk Skoru: ${res.skor} (Ana Risk: ${res.anaKategori})`;
+            
+            resultDescription.innerHTML = `<div class="space-y-2">
+                <p class="font-semibold">Aşağıdaki potansiyel riskler tespit edildi:</p>
+                <ul class="list-disc list-inside space-y-1">` +
+                res.detay.map(d => `<li><strong>${d.kategori}</strong>: ${d.aciklama}</li>`).join('') +
+                `</ul>
+                <p class="mt-4 pt-3 border-t border-red-200 font-semibold">Orjinal Metin (Vurgulanmış):</p>
+                <p class="p-3 bg-red-100 rounded-md text-gray-800">${highlight(mesaj, res.detay)}</p>
+            </div>`;
+        } else {
+            resultContainer.classList.add('bg-green-50','border-green-500','text-green-900');
+            resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
+            resultScore.textContent = `Risk Skoru: ${res.skor}`;
+            resultDescription.innerHTML = `<p>${res.aciklama}</p>`;
+        }
+        resultContainer.classList.remove('hidden');
+    };
+
+    analyzeButton.addEventListener('click', runAnalysis);
+    messageInput.addEventListener('input', debounce(runAnalysis, 400));
     </script>
 </body>
 </html>
-```
