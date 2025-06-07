@@ -80,32 +80,25 @@
             const prompt = `
             Sen Türk Rekabet Hukuku konusunda uzman bir yapay zeka asistanısın. Görevin, sana verilen metni analiz edip potansiyel rekabet hukuku ihlali riski taşıyıp taşımadığını değerlendirmektir.
             Analizinde özellikle şu üç ana riske odaklan:
-            1.  **Fiyat Anlaşması Riski**: Rakiplerle birlikte fiyat belirleme, zam yapma, indirimleri koordine etme.
-            2.  **Pazar Paylaşımı Riski**: Rakiplerle bölge, müşteri veya pazar paylaşma anlaşmaları.
-            3.  **Hassas Bilgi Değişimi Riski**: Rakiplerle fiyat, maliyet, teklif gibi ticari sırların paylaşılması.
-            
+            1.  Fiyat Anlaşması Riski
+            2.  Pazar Paylaşımı Riski
+            3.  Hassas Bilgi Değişimi Riski
+
             Analiz edilecek metin: "${metin}"
-            
-            Lütfen analizinin sonucunu, aşağıda tanımlanan JSON formatına birebir uygun olarak ver. Metinde hiçbir risk yoksa, sonucu "Temiz" olarak belirt, risk skoru olarak 0.1 gibi düşük bir değer ata ve açıklamayı olumlu yap. Risk varsa, en önemli riski belirt ve skorunu 0.5 ile 1.0 arasında ata.
+
+            Lütfen, cevabını SADECE ve SADECE aşağıdaki anahtarlara sahip geçerli bir JSON nesnesi olarak döndür:
+            - "sonuc": Değeri "Riskli" veya "Temiz" olabilir.
+            - "risk_kategorisi": Risk varsa kategorisini yaz, yoksa "Yok" yaz.
+            - "risk_skoru": 0.0 ile 1.0 arasında bir sayı.
+            - "aciklama": Bulgularını özetleyen kısa bir cümle.
+
+            Başka hiçbir metin, açıklama veya formatlama ekleme. Sadece JSON metnini döndür.
             `;
             
             const payload = {
                 contents: [{
                     parts: [{ text: prompt }]
-                }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            sonuc: { "type": "STRING", "enum": ["Riskli", "Temiz"] },
-                            risk_kategorisi: { "type": "STRING" },
-                            risk_skoru: { "type": "NUMBER" },
-                            aciklama: { "type": "STRING" }
-                        },
-                        "required": ["sonuc", "risk_kategorisi", "risk_skoru", "aciklama"]
-                    }
-                }
+                }]
             };
             
             try {
@@ -120,8 +113,22 @@
                 }
 
                 const result = await response.json();
-                const jsonText = result.candidates[0].content.parts[0].text;
-                return JSON.parse(jsonText);
+                
+                if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                    let jsonText = result.candidates[0].content.parts[0].text;
+                    
+                    // HATA DÜZELTME: API bazen cevabı markdown formatında (```json ... ```) döndürebiliyor.
+                    // Bu satırlar, bu formatı temizleyerek sadece saf JSON metnini bırakır.
+                    if (jsonText.startsWith("```json")) {
+                        jsonText = jsonText.substring(7, jsonText.length - 3).trim();
+                    } else if (jsonText.startsWith("```")) {
+                        jsonText = jsonText.substring(3, jsonText.length - 3).trim();
+                    }
+
+                    return JSON.parse(jsonText);
+                } else {
+                    throw new Error("API'den beklenen formatta bir cevap alınamadı.");
+                }
 
             } catch (error) {
                 console.error("Hata:", error);
@@ -171,4 +178,4 @@
         });
     </script>
 </body>
-</html>
+</ht
