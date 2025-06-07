@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gözcü Projesi - AI Destekli Demo</title>
+    <title>Gözcü Projesi - Gelişmiş Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,19 +12,6 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Buton yüklenme animasyonu için stil */
-        .loader {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #3498db;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen">
@@ -32,7 +19,7 @@
 
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">Gözcü Projesi</h1>
-            <p class="mt-2 text-gray-600">AI Destekli Rekabet Hukuku Uyum Asistanı</p>
+            <p class="mt-2 text-gray-600">Gelişmiş Rekabet Hukuku Uyum Asistanı</p>
         </div>
 
         <div class="mt-8">
@@ -41,9 +28,8 @@
         </div>
 
         <div class="mt-6">
-            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all flex items-center justify-center">
-                <span id="buttonText">Mesajı Analiz Et</span>
-                <div id="loader" class="loader hidden ml-3"></div>
+            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
+                Mesajı Analiz Et
             </button>
         </div>
 
@@ -61,97 +47,69 @@
         const resultTitle = document.getElementById('resultTitle');
         const resultScore = document.getElementById('resultScore');
         const resultDescription = document.getElementById('resultDescription');
-        const buttonText = document.getElementById('buttonText');
-        const loader = document.getElementById('loader');
 
-        async function aiRiskAnalizi(metin) {
-            buttonText.textContent = "Analiz Ediliyor...";
-            loader.classList.remove('hidden');
-            analyzeButton.disabled = true;
+        /**
+         * GELİŞTİRİLMİŞ ANALİZ MOTORU: Bu fonksiyon, dış bir API'ye ihtiyaç duymadan,
+         * daha akıllı bir kural seti ile metni analiz eder.
+         */
+        function gelismisRiskAnalizi(metin) {
+            if (!metin.trim()) {
+                return { sonuc: "Boş Metin", aciklama: "Lütfen analiz edilecek bir metin girin." };
+            }
 
-            const apiKey = ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            const prompt = `
-            Sen Türk Rekabet Hukuku konusunda uzman bir yapay zeka asistanısın. Görevin, sana verilen metni analiz edip potansiyel rekabet hukuku ihlali riski taşıyıp taşımadığını değerlendirmektir.
-            Analizinde özellikle şu üç ana riske odaklan:
-            1.  Fiyat Anlaşması Riski
-            2.  Pazar Paylaşımı Riski
-            3.  Hassas Bilgi Değişimi Riski
-
-            Analiz edilecek metin: "${metin}"
-
-            Lütfen, cevabını SADECE ve SADECE aşağıdaki anahtarlara sahip geçerli bir JSON nesnesi olarak döndür:
-            - "sonuc": Değeri "Riskli" veya "Temiz" olabilir.
-            - "risk_kategorisi": Risk varsa kategorisini yaz, yoksa "Yok" yaz.
-            - "risk_skoru": 0.0 ile 1.0 arasında bir sayı.
-            - "aciklama": Bulgularını özetleyen kısa bir cümle.
-
-            Başka hiçbir metin, açıklama veya formatlama ekleme. Sadece JSON metnini döndür.
-            `;
+            const temiz_metin = metin.toLowerCase();
             
-            const payload = {
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
+            // Anahtar kelimeler yerine daha esnek olan "Regular Expressions" (Regex) kullanıyoruz.
+            // Bu sayede "zam yapalım", "zam yapsak", "zam yapacağız" gibi farklı kullanımları yakalayabiliriz.
+            const risk_katalogu = {
+                "Fiyat Anlaşması Riski": {
+                    "regex": /(fiyatları\s*(artıralım|yükseltelim|sabitleyelim))|(aynı\s*fiyat)|(fiyat\s*listesi)|(zam\s*(yap|yapac))/,
+                    "skor": 0.95,
+                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle fiyat belirleme riski taşıyabilir."
+                },
+                "Pazar Paylaşımı Riski": {
+                    "regex": /(bölge|pazar|müşteri.*)\s*(paylaş|paylaşım|paylaşalım|paylaşımı)|(sen\s*o\s*(bölgeye|müşteriye)\s*girme)/,
+                    "skor": 0.90,
+                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle pazar veya müşteri paylaşma riski taşıyabilir."
+                },
+                "Hassas Bilgi Değişimi Riski": {
+                    "regex": /(rakibin\s*(teklifi|fiyatı|maliyeti))|(gizli\s*bilgi)/,
+                    "skor": 0.75,
+                    "aciklama_sablonu": "'{ifade}' gibi bir ifade, rakiplerle hassas ticari bilgi paylaşımı riski taşıyabilir."
+                }
             };
-            
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`API isteği başarısız oldu. Durum Kodu: ${response.status}`);
+
+            let tespit_edilen_riskler = [];
+            for (const [kategori, detay] of Object.entries(risk_katalogu)) {
+                const eslesme = temiz_metin.match(detay.regex);
+                if (eslesme) {
+                    tespit_edilen_riskler.push({
+                        "risk_kategorisi": kategori,
+                        "risk_skoru": detay.skor,
+                        "tetikleyen_ifade": eslesme[0].trim(), // Eşleşen ifadenin kendisini alıyoruz.
+                        "aciklama": detay.aciklama_sablonu.replace('{ifade}', eslesme[0].trim())
+                    });
                 }
+            }
 
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates[0]?.content?.parts[0]) {
-                    let jsonText = result.candidates[0].content.parts[0].text;
-                    
-                    const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
-                    if (jsonMatch && jsonMatch[0]) {
-                        return JSON.parse(jsonMatch[0]);
-                    } else {
-                         throw new Error("API cevabında geçerli bir JSON bulunamadı.");
-                    }
-
-                } else {
-                    // API'den bir cevap geldi ancak 'candidates' kısmı boş veya hatalıysa bunu belirtelim.
-                    throw new Error("API'den beklenen formatta bir cevap alınamadı. Gelen cevap: " + JSON.stringify(result));
-                }
-
-            } catch (error) {
-                console.error("Hata:", error);
-                // DÜZELTME: Hata mesajını daha detaylı hale getiriyoruz.
+            if (tespit_edilen_riskler.length === 0) {
                 return {
-                    sonuc: "Hata",
-                    aciklama: `Teknik Hata: ${error.message}`
+                    sonuc: "Temiz",
+                    risk_skoru: 0.10,
+                    aciklama: "Metinde belirgin bir rekabet hukuku riski tespit edilmedi."
                 };
-            } finally {
-                buttonText.textContent = "Mesajı Analiz Et";
-                loader.classList.add('hidden');
-                analyzeButton.disabled = false;
+            } else {
+                let en_yuksek_risk = tespit_edilen_riskler.sort((a, b) => b.risk_skoru - a.risk_skoru)[0];
+                en_yuksek_risk.sonuc = 'Riskli';
+                return en_yuksek_risk;
             }
         }
 
-        analyzeButton.addEventListener('click', async () => {
+        analyzeButton.addEventListener('click', () => {
             const mesaj = messageInput.value;
-            if (!mesaj.trim()) {
-                resultContainer.className = 'mt-8 p-6 rounded-lg border bg-yellow-100 border-yellow-500 text-yellow-900';
-                resultTitle.textContent = 'UYARI';
-                resultScore.textContent = '';
-                resultDescription.textContent = "Lütfen analiz edilecek bir metin girin.";
-                resultContainer.classList.remove('hidden');
-                return;
-            }
+            const analizSonucu = gelismisRiskAnalizi(mesaj);
 
-            const analizSonucu = await aiRiskAnalizi(mesaj);
-            
-            resultContainer.className = 'mt-8 p-6 rounded-lg border';
+            resultContainer.className = 'mt-8 p-6 rounded-lg border'; 
 
             if (analizSonucu.sonuc === 'Riskli') {
                 resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
@@ -161,9 +119,9 @@
                 resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
                 resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
                 resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
-            } else { 
+            } else {
                 resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');
-                resultTitle.textContent = 'HATA';
+                resultTitle.textContent = 'UYARI';
                 resultScore.textContent = '';
             }
             resultDescription.textContent = analizSonucu.aciklama;
@@ -173,4 +131,3 @@
 </body>
 </html>
 ```
-Lütfen GitHub'daki `index.html` dosyanızı bu yeni kodla güncelleyin. Şimdi tekrar denediğinizde, sarı hata kutusunda daha teknik bir açıklama görmelisiniz. O yeni hata mesajını bana iletirseniz, sorunu kesin olarak çözebilir
