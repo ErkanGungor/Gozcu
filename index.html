@@ -1,158 +1,131 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2299.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gözcü Projesi - İnteraktif Demo</title>
+    <!-- Tailwind CSS'i projeye dahil ediyoruz (Hata burada düzeltildi) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="tr"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Gözcü Projesi - İnteraktif Demo&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Tailwind CSS'i projeye dahil ediyoruz --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: 'Inter', sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body class="bg-gray-50 flex items-center justify-center min-h-screen"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-lg"&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Başlık ve Açıklama Alanı --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="text-center"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1 class="text-3xl font-bold text-gray-800"&gt;Gözcü Projesi&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="mt-2 text-gray-600"&gt;Rekabet Hukuku Uyum Asistanı - İnteraktif Demo&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Metin Giriş Alanı --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="mt-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;label for="message" class="block text-sm font-medium text-gray-700"&gt;Analiz edilecek mesajınızı buraya yazın:&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Örn: Arkadaşlar, rakip firma ile görüştüm. Fiyatları artıralım diyorum..."&gt;&lt;/textarea&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Buton Alanı --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="mt-6"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>Mesajı Analiz Et</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Sonuç Gösterim Alanı --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="resultContainer" class="mt-8 p-6 rounded-lg hidden"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 id="resultTitle" class="text-lg font-bold"&gt;&lt;/h3&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p id="resultScore" class="mt-1 text-sm"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p id="resultDescription" class="mt-2"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const analyzeButton = document.getElementById('analyzeButton');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const messageInput = document.getElementById('message');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resultContainer = document.getElementById('resultContainer');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resultTitle = document.getElementById('resultTitle');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resultScore = document.getElementById('resultScore');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const resultDescription = document.getElementById('resultDescription');</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>/**</p>
-<p class="p1"><span class="Apple-converted-space">         </span>* Colab'daki analiz fonksiyonunun aynısı.</p>
-<p class="p1"><span class="Apple-converted-space">         </span>* Bir metni analiz edip potansiyel rekabet hukuku risklerini değerlendirir.</p>
-<p class="p1"><span class="Apple-converted-space">         </span>*/</p>
-<p class="p1"><span class="Apple-converted-space">        </span>function riskAnalizi(metin) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!metin.trim()) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>sonuc: "Boş Metin",</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>risk_skoru: 0.0,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>aciklama: "Lütfen analiz edilecek bir metin girin."</p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const temiz_metin = metin.toLowerCase();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const risk_katalogu = {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>"Fiyat Anlaşması Riski": {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"kelimeler": ["fiyatları artıralım", "fiyatları yükseltelim", "fiyat sabitleyelim", "aynı fiyattan", "fiyat listesi", "zam yapalım"],</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"skor": 0.95</p>
-<p class="p1"><span class="Apple-converted-space">                </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                </span>"Pazar Paylaşımı Riski": {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"kelimeler": ["bölge paylaşımı", "pazarı paylaşalım", "sen o bölgeye girme", "müşterileri paylaşalım", "sen o müşteriye gitme"],</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"skor": 0.90</p>
-<p class="p1"><span class="Apple-converted-space">                </span>},</p>
-<p class="p1"><span class="Apple-converted-space">                </span>"Rakip Bilgisi Riski": {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"kelimeler": ["rakibin teklifi", "rakip fiyatı", "rakibin maliyeti", "gizli bilgi"],</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>"skor": 0.75</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let tespit_edilen_riskler = [];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>for (const [kategori, detay] of Object.entries(risk_katalogu)) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>for (const kelime of detay.kelimeler) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>if (temiz_metin.includes(kelime)) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>tespit_edilen_riskler.push({</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>"risk_kategorisi": kategori,</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>"risk_skoru": detay.skor,</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>"tetikleyen_ifade": kelime</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (tespit_edilen_riskler.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>sonuc: "Temiz",</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>risk_skoru: 0.10,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>aciklama: "Metinde belirgin bir rekabet hukuku riski tespit edilmedi."</p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let en_yuksek_risk = tespit_edilen_riskler.sort((a, b) =&gt; b.risk_skoru - a.risk_skoru)[0];</p>
-<p class="p1"><span class="Apple-converted-space">                </span>en_yuksek_risk.sonuc = 'Riskli';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>en_yuksek_risk.aciklama = `'${en_yuksek_risk.tetikleyen_ifade}' ifadesi nedeniyle yüksek risk tespit edildi.`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return en_yuksek_risk;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Butona tıklandığında çalışacak fonksiyon</p>
-<p class="p1"><span class="Apple-converted-space">        </span>analyzeButton.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const mesaj = messageInput.value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const analizSonucu = riskAnalizi(mesaj);</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Önceki stil sınıflarını temizle</p>
-<p class="p1"><span class="Apple-converted-space">            </span>resultContainer.classList.remove('bg-red-100', 'border-red-500', 'text-red-900', 'bg-green-100', 'border-green-500', 'text-green-900', 'bg-yellow-100', 'border-yellow-500', 'text-yellow-900', 'hidden');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>resultContainer.classList.add('border');</p>
-<p class="p2"><br></p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (analizSonucu.sonuc === 'Riskli') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultTitle.textContent = `ANALİZ SONUCU: RİSKLİ`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultScore.textContent = `Risk Kategorisi: ${analizSonucu.risk_kategorisi} | Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (analizSonucu.sonuc === 'Temiz') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else { // Boş metin durumu</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultTitle.textContent = 'UYARI';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>resultScore.textContent = '';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>resultDescription.textContent = analizSonucu.aciklama;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>resultContainer.classList.remove('hidden');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-2xl mx-auto p-6 md:p-8 bg-white rounded-xl shadow-lg">
+
+        <!-- Başlık ve Açıklama Alanı -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800">Gözcü Projesi</h1>
+            <p class="mt-2 text-gray-600">Rekabet Hukuku Uyum Asistanı - İnteraktif Demo</p>
+        </div>
+
+        <!-- Metin Giriş Alanı -->
+        <div class="mt-8">
+            <label for="message" class="block text-sm font-medium text-gray-700">Analiz edilecek mesajınızı buraya yazın:</label>
+            <textarea id="message" rows="6" class="mt-2 w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Örn: Arkadaşlar, rakip firma ile görüştüm. Fiyatları artıralım diyorum..."></textarea>
+        </div>
+
+        <!-- Buton Alanı -->
+        <div class="mt-6">
+            <button id="analyzeButton" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-transform transform hover:scale-105">
+                Mesajı Analiz Et
+            </button>
+        </div>
+
+        <!-- Sonuç Gösterim Alanı -->
+        <div id="resultContainer" class="mt-8 p-6 rounded-lg hidden">
+            <h3 id="resultTitle" class="text-lg font-bold"></h3>
+            <p id="resultScore" class="mt-1 text-sm"></p>
+            <p id="resultDescription" class="mt-2"></p>
+        </div>
+    </div>
+
+    <script>
+        const analyzeButton = document.getElementById('analyzeButton');
+        const messageInput = document.getElementById('message');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultScore = document.getElementById('resultScore');
+        const resultDescription = document.getElementById('resultDescription');
+
+        function riskAnalizi(metin) {
+            if (!metin.trim()) {
+                return {
+                    sonuc: "Boş Metin",
+                    risk_skoru: 0.0,
+                    aciklama: "Lütfen analiz edilecek bir metin girin."
+                };
+            }
+
+            const temiz_metin = metin.toLowerCase();
+            const risk_katalogu = {
+                "Fiyat Anlaşması Riski": {
+                    "kelimeler": ["fiyatları artıralım", "fiyatları yükseltelim", "fiyat sabitleyelim", "aynı fiyattan", "fiyat listesi", "zam yapalım"],
+                    "skor": 0.95
+                },
+                "Pazar Paylaşımı Riski": {
+                    "kelimeler": ["bölge paylaşımı", "pazarı paylaşalım", "sen o bölgeye girme", "müşterileri paylaşalım", "sen o müşteriye gitme"],
+                    "skor": 0.90
+                },
+                "Rakip Bilgisi Riski": {
+                    "kelimeler": ["rakibin teklifi", "rakip fiyatı", "rakibin maliyeti", "gizli bilgi"],
+                    "skor": 0.75
+                }
+            };
+
+            let tespit_edilen_riskler = [];
+            for (const [kategori, detay] of Object.entries(risk_katalogu)) {
+                for (const kelime of detay.kelimeler) {
+                    if (temiz_metin.includes(kelime)) {
+                        tespit_edilen_riskler.push({
+                            "risk_kategorisi": kategori,
+                            "risk_skoru": detay.skor,
+                            "tetikleyen_ifade": kelime
+                        });
+                    }
+                }
+            }
+
+            if (tespit_edilen_riskler.length === 0) {
+                return {
+                    sonuc: "Temiz",
+                    risk_skoru: 0.10,
+                    aciklama: "Metinde belirgin bir rekabet hukuku riski tespit edilmedi."
+                };
+            } else {
+                let en_yuksek_risk = tespit_edilen_riskler.sort((a, b) => b.risk_skoru - a.risk_skoru)[0];
+                en_yuksek_risk.sonuc = 'Riskli';
+                en_yuksek_risk.aciklama = `'${en_yuksek_risk.tetikleyen_ifade}' ifadesi nedeniyle yüksek risk tespit edildi.`;
+                return en_yuksek_risk;
+            }
+        }
+
+        analyzeButton.addEventListener('click', () => {
+            const mesaj = messageInput.value;
+            const analizSonucu = riskAnalizi(mesaj);
+
+            resultContainer.className = 'mt-8 p-6 rounded-lg border'; // Reset classes
+
+            if (analizSonucu.sonuc === 'Riskli') {
+                resultContainer.classList.add('bg-red-100', 'border-red-500', 'text-red-900');
+                resultTitle.textContent = `ANALİZ SONUCU: RİSKLİ`;
+                resultScore.textContent = `Risk Kategorisi: ${analizSonucu.risk_kategorisi} | Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
+            } else if (analizSonucu.sonuc === 'Temiz') {
+                resultContainer.classList.add('bg-green-100', 'border-green-500', 'text-green-900');
+                resultTitle.textContent = 'ANALİZ SONUCU: TEMİZ';
+                resultScore.textContent = `Risk Skoru: ${analizSonucu.risk_skoru.toFixed(2)}`;
+            } else {
+                resultContainer.classList.add('bg-yellow-100', 'border-yellow-500', 'text-yellow-900');
+                resultTitle.textContent = 'UYARI';
+                resultScore.textContent = '';
+            }
+            resultDescription.textContent = analizSonucu.aciklama;
+        });
+    </script>
 </body>
 </html>
